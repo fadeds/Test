@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="百度地图,百度地图API，百度地图自定义工具，百度地图所见即所得工具" />
+    <meta name="description" content="百度地图API自定义地图，帮助用户在可视化操作下生成百度地图" />
+    <title>百度地图API自定义地图</title>
+    <!--引用百度地图API-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=V3DFDbbrnME5bWloFb95nRlQHTVQNFEP"></script>
+    <style>
+     /* .BMapLabel{
+        color: red;
+      }*/
+    </style>
+  </head>
+  
+  <body>
+    <!--百度地图容器-->
+    <div style="width:100%;height:500px;border:#ccc solid 1px;font-size:12px" id="map"></div>
+  </body>
+  <script type="text/javascript">
+    //创建和初始化地图函数：
+    var map;
+    function initMap(){
+      createMap();//创建地图
+      setMapEvent();//设置地图事件
+      addMapControl();//向地图添加控件
+      addMapOverlay();//向地图添加覆盖物
+    }
+    function createMap(){ 
+      map = new BMap.Map("map"); 
+      map.centerAndZoom(new BMap.Point(121.47,31.23),11);
+    }
+    function setMapEvent(){
+      map.enableScrollWheelZoom();
+      map.enableKeyboard();
+      map.enableDragging();
+      map.enableDoubleClickZoom()
+    }
+    function addClickHandler(target,window){
+      target.addEventListener("click",function(){
+        target.openInfoWindow(window);
+      });
+    }
+
+    function drive(markers){
+      var driving = new BMap.DrivingRoute(map);   //创建驾车实例
+      markers.forEach((item,index)=>{
+        if(!markers[index+1]){
+            return
+        } 
+        driving.search(item, markers[index+1]);         
+      })
+      console.log(driving.setSearchCompleteCallback)
+      driving.setSearchCompleteCallback(function(){
+          var pts = driving.getResults().getPlan(0).getRoute(0).getPath();    //通过驾车实例，获得一系列点的数组
+          var polyline = new BMap.Polyline(pts);     
+              map.addOverlay(polyline);
+          setTimeout(function(){
+              map.setViewport(markers);          //调整到最佳视野
+          },1000);
+      });
+    }
+    function addMapOverlay(){
+      var markers = [
+        {content:"收货233",title:"大酒店",imageOffset: {width:0,height:3},position:{lng:106.521436,lat:29.532288}},
+        {content:"宜昌",title:"宜昌",imageOffset: {width:0,height:3},position:{lng:110.15,lat:30.123}},
+        {content:"广安",title:"广安",imageOffset: {width:0,height:3},position:{lng:101.56,lat:31.3}},
+        {content:"广安",title:"广安",imageOffset: {width:0,height:3},position:{lng:102.56,lat:32.3}},
+        {content:"广安",title:"广安",imageOffset: {width:0,height:3},position:{lng:103.56,lat:33.3}},
+        {content:"广安",title:"广安",imageOffset: {width:0,height:3},position:{lng:104.56,lat:34.3}},
+      
+        {content:"收货1225",title:"小酒店",imageOffset: {width:0,height:3},position:{lng:108.983569,lat:34.285675}},
+      ];
+       var markers1=markers.slice(0,3)
+
+      let arr = [];
+      markers1.forEach((item,index)=>{
+          arr.push(new BMap.Point(item.position.lng,item.position.lat))
+      })
+      console.log(arr);
+      for(var index = 0; index < markers.length; index++ ){
+        var point = new BMap.Point(markers[index].position.lng,markers[index].position.lat);
+        var marker = new BMap.Marker(point,{icon:new BMap.Icon("http://api.map.baidu.com/lbsapi/createmap/images/icon.png",new BMap.Size(20,25),{
+          imageOffset: new BMap.Size(-45,-21)
+        })});
+        var label = new BMap.Label(markers[index].title,{offset: new BMap.Size(25,5)});
+        label.setStyle({
+          color: "red"
+        });
+        var opts = {
+          width: 200,
+          title: markers[index].title,
+          enableMessage: false
+        };
+        var sContent =`<div>
+                          <p>酒店负责人${markers[index].content}</p>
+                          <p>联系方式${markers[index].content}</p>
+                          <p>地址${markers[index].content}</p>
+                      </div>`
+        var infoWindow = new BMap.InfoWindow(sContent,opts);
+        marker.setLabel(label);
+        addClickHandler(marker,infoWindow);
+        map.addOverlay(marker);
+      };
+      drive(arr);
+      // for(var index = 0; index < markers1.length; index++ ){
+      //   var point = new BMap.Point(markers1[index].position.lng,markers1[index].position.lat);
+      //   var marker = new BMap.Marker(point,{icon:new BMap.Icon("http://api.map.baidu.com/lbsapi/createmap/images/icon.png",new BMap.Size(20,25),{
+      //     imageOffset: new BMap.Size(-45,-21)
+      //   })});
+      //   var label = new BMap.Label(markers1[index].title,{offset: new BMap.Size(25,5)});
+      //   label.setStyle({
+      //     color: "red"
+      //   });
+      //   var opts = {
+      //     width: 200,
+      //     title: markers1[index].title,
+      //     enableMessage: false
+      //   };
+      //   var sContent =`<div>
+      //                     <p>酒店负责人${markers1[index].content}</p>
+      //                     <p>联系方式${markers1[index].content}</p>
+      //                     <p>地址${markers1[index].content}</p>
+      //                 </div>`
+      //   var infoWindow = new BMap.InfoWindow(sContent,opts);
+      //   marker.setLabel(label);
+      //   addClickHandler(marker,infoWindow);
+      //   drive(arr);
+      //   map.addOverlay(marker);
+      // };
+    }
+    //向地图添加控件
+    function addMapControl(){
+      var scaleControl = new BMap.ScaleControl({anchor:BMAP_ANCHOR_BOTTOM_LEFT});
+      scaleControl.setUnit(BMAP_UNIT_IMPERIAL);
+      map.addControl(scaleControl);
+      var navControl = new BMap.NavigationControl({anchor:BMAP_ANCHOR_TOP_LEFT,type:BMAP_NAVIGATION_CONTROL_LARGE});
+      map.addControl(navControl);
+      var overviewControl = new BMap.OverviewMapControl({anchor:BMAP_ANCHOR_BOTTOM_RIGHT,isOpen:true});
+      map.addControl(overviewControl);
+    }
+    initMap();
+  </script>
+</html>

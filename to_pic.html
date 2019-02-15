@@ -1,0 +1,47 @@
+<html>    
+    <head>    
+        <meta name="layout" content="main">    
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />      
+        <script type="text/javascript" src="http://mat1.gtimg.com/libs/jquery2/2.2.0/jquery.js"></script>    
+        <script type="text/javascript" src="html2canvas.js"></script>    
+        <script type="text/javascript" src="canvas2image.js"></script>    
+             
+        <script  type="text/javascript" >    
+    $(document).ready( function(){    
+                $(".button").on("click", function(event) {    
+                        event.preventDefault();    
+                        html2canvas(document.getElementById("textArea"), {  
+                        useCORS:true,  
+                        // allowTaint: true,    
+                        // taintTest: false,    
+                        // onrendered: function(canvas) {    
+                        //     canvas.id = "mycanvas";    
+                        //     //生成base64图片数据    
+                        //     var dataUrl = canvas.toDataURL();    
+                        //     var newImg = document.createElement("img");    
+                        //     newImg.src =  dataUrl;    
+                        //     document.body.appendChild(newImg);    
+                        // }    
+                    }).then(res=>{
+                        // document.body.appendChild(res)
+                        res.id = "mycanvas";    
+                        //生成base64图片数据    
+                        var dataUrl = res.toDataURL();    
+                        var newImg = document.createElement("img");    
+                        newImg.src =  dataUrl;    
+                        Canvas2Image.saveAsImage(res, 100, 100,"png")
+                        document.body.appendChild(newImg);
+                    });    
+                });     
+    });    
+        </script>    
+    </head>    
+    <body>     
+        <div class="" style="background-color: white;">     
+            测试图片  
+        </div>    
+             
+        <textArea id="textArea" col="20" rows="10" ></textArea>    
+        <input class="button" type="button" value="button">测试</input>    
+    </body>    
+</html>

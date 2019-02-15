@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>弹框（拖动）</title>
+<style type="text/css">
+.pannel{
+    width: 500px;
+    height: 300px;
+    /*background-color: #FF8604;*/
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.pannel .title{
+	width: 100%;
+	height: 50px;
+    line-height: 50px;
+	background-color: #4390EE;
+	position: absolute;
+	left: 0;
+	top: 0;
+    border-radius: 6px 6px 0 0;
+}
+.pannel .content{
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+    background-color: red;
+    border-radius: 0 0 6px 6px;
+}
+</style>
+</head>
+<body>
+ 
+<div class="pannel">
+    <div class="title" id="title_1">
+        <div>标题1</div>
+    </div>
+    <div class="content">
+        <div>内容111</div>
+    </div>
+</div>
+<div class="pannel">
+    <div class="title" id="title_2">
+        <div>标题2</div>
+    </div>
+    <div class="content">
+        <div>内容222</div>
+    </div>
+</div>
+ 
+<script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+<script type="application/javascript">
+ 
+    function Mover(id) {
+        this.obj = document.getElementById(id);
+        this.startx = 0;
+        this.starty;
+        this.startLeft;
+        this.startTop;
+        this.mainDiv = this.obj.parentNode;
+        this.isDown = false;
+        this.originIndex = this.mainDiv.style.zIndex;
+        var that = this;
+ 
+        this.movedown = function (e) {
+            e = e ? e : window.event;
+            if (!window.captureEvents) {
+                this.setCapture();
+            }  
+ 
+            that.isDown = true;
+            that.obj.style.cursor = 'move';
+            that.mainDiv.style.zIndex = 1000;
+            
+            that.startx = e.clientX;
+            that.starty = e.clientY;
+            that.startLeft = parseInt(that.mainDiv.offsetLeft);
+            that.startTop = parseInt(that.mainDiv.offsetTop);
+        }
+        this.move = function (e) {
+            e = e ? e : window.event;
+            if (that.isDown) {
+                that.mainDiv.style.left = e.clientX - (that.startx - that.startLeft) + "px";
+                that.mainDiv.style.top = e.clientY - (that.starty - that.startTop) + "px";
+            }
+        }
+        this.moveup = function () {
+            that.isDown = false;
+            that.obj.style.cursor = 'default';
+            that.mainDiv.style.zIndex = that.originIndex;
+            if (!window.captureEvents) {
+                this.releaseCapture();
+            } 
+        }
+        this.obj.onmousedown = this.movedown;
+        this.obj.onmousemove = this.move;
+        this.obj.onmouseup = this.moveup;
+ 
+        //非ie浏览器
+        document.addEventListener("mousemove", this.move, true);
+    }
+ 
+    var mover1 = new Mover("title_1");
+    var mover2 = new Mover("title_2");
+ 
+ 
+</script>
+</body>
+</html>
